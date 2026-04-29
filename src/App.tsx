@@ -421,10 +421,7 @@ export default function App() {
               <div className="flex flex-col flex-1 min-w-0 justify-center">
                 <div className="flex items-center gap-2 mb-0.5">
                   <span className="font-semibold text-[15px] truncate text-white">
-                    {(lanyard?.discord_user as any)?.global_name ||
-                      lanyard?.discord_user?.display_name ||
-                      lanyard?.discord_user?.username ||
-                      "m5rcel"}
+                    {lanyard?.discord_user?.username || "m5rcel"}
                   </span>
                   {clan?.tag && (
                     <div className="group relative inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-[5px] bg-[#1a1a1a] border border-white/5 text-[9px] font-bold tracking-wider text-[#a0a0a0] cursor-help">
