@@ -172,7 +172,7 @@ export default function App() {
   const [isReady, setIsReady] = useState(false);
   const [isDomainsOpen, setIsDomainsOpen] = useState(false);
   const [domainStatuses, setDomainStatuses] = useState<
-    Record<string, boolean | null>
+    Record<string, "NS" | "A" | false | null>
   >({});
 
   const [progressData, setProgressData] = useState({
@@ -191,13 +191,27 @@ export default function App() {
       DOMAINS.forEach(async (domainObj) => {
         const domain = domainObj.name;
         try {
-          const res = await fetch(`https://dns.google/resolve?name=${domain}`);
-          const data = await res.json();
-          const isActive =
-            data.Status === 0 &&
-            Array.isArray(data.Answer) &&
-            data.Answer.length > 0;
-          setDomainStatuses((prev) => ({ ...prev, [domain]: isActive }));
+          const [nsRes, aRes] = await Promise.all([
+            fetch(`https://dns.google/resolve?name=${domain}&type=NS`),
+            fetch(`https://dns.google/resolve?name=${domain}&type=A`)
+          ]);
+          const nsData = await nsRes.json();
+          const aData = await aRes.json();
+
+          let statusType: "NS" | "A" | false = false;
+
+          const hasCloudflareNS = 
+            nsData.Status === 0 && 
+            Array.isArray(nsData.Answer) && 
+            nsData.Answer.some((r: any) => r.type === 2 && r.data.toLowerCase().includes("cloudflare.com"));
+
+          if (hasCloudflareNS) {
+            statusType = "NS";
+          } else if (aData.Status === 0 && Array.isArray(aData.Answer) && aData.Answer.length > 0) {
+            statusType = "A";
+          }
+
+          setDomainStatuses((prev) => ({ ...prev, [domain]: statusType }));
         } catch (e) {
           setDomainStatuses((prev) => ({ ...prev, [domain]: false }));
         }
@@ -572,7 +586,19 @@ export default function App() {
               >
                 <div className="overflow-hidden">
                   <div className="p-4 pt-0 flex flex-col gap-1 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
-                    {DOMAINS.map((domainObj) => {
+                    {[...DOMAINS]
+                      .sort((a, b) => {
+                        const getWeight = (status: "NS" | "A" | false | null | undefined) => {
+                          if (status === "NS" || status === "A") return 2;
+                          if (status === undefined || status === null) return 1;
+                          return 0;
+                        };
+                        const aWeight = getWeight(domainStatuses[a.name]);
+                        const bWeight = getWeight(domainStatuses[b.name]);
+                        if (aWeight !== bWeight) return bWeight - aWeight;
+                        return a.name.localeCompare(b.name);
+                      })
+                      .map((domainObj) => {
                       const domain = domainObj.name;
                       const isActive = domainStatuses[domain];
                       const isChecking =
@@ -602,19 +628,24 @@ export default function App() {
                                 Checking...
                               </span>
                             ) : isActive ? (
-                              <>
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#23a559] animate-pulse shadow-[0_0_5px_#23a559]"></span>
-                                <span className="text-[10px] uppercase font-bold tracking-wider text-[#555] group-hover:text-[#888] bg-[#161616] px-2 py-1 rounded-[4px] border border-white/5">
-                                  Active
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[10px] uppercase font-bold tracking-wider text-[#aaa] bg-[#1a1a1a] px-1.5 py-0.5 rounded-[4px] border border-white/10">
+                                  {isActive}
                                 </span>
-                              </>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-[#23a559] animate-pulse shadow-[0_0_5px_#23a559]"></span>
+                                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#555] group-hover:text-[#888] bg-[#161616] px-2 py-1 rounded-[4px] border border-white/5">
+                                    Active
+                                  </span>
+                                </div>
+                              </div>
                             ) : (
-                              <>
+                              <div className="flex items-center gap-1.5">
                                 <span className="w-1.5 h-1.5 rounded-full bg-[#f87171]"></span>
                                 <span className="text-[10px] uppercase font-bold tracking-wider text-[#f87171] bg-[#161616] px-2 py-1 rounded-[4px] border border-[#f87171]/20">
                                   Inactive
                                 </span>
-                              </>
+                              </div>
                             )}
                           </div>
                         </a>
