@@ -253,10 +253,16 @@ export default function App() {
     };
 
     const interval = setInterval(() => {
-      const { start, end } = lanyard.spotify!.timestamps;
+      const spotify = lanyard.spotify;
+      if (!spotify) return;
+
+      const { start, end } = spotify.timestamps;
       const total = end - start;
-      const current = Date.now() - start;
-      const percent = Math.min(Math.max((current / total) * 100, 0), 100);
+      const now = Date.now();
+      
+      // Ensure current doesn't exceed total
+      const current = Math.min(Math.max(now - start, 0), total);
+      const percent = (current / total) * 100;
 
       setProgressData({
         percent,
@@ -347,7 +353,7 @@ export default function App() {
               <div className="mt-4 flex flex-col items-start gap-1">
                 <div className="flex items-center flex-wrap gap-x-3 gap-y-2">
                   <div className="group relative inline-block">
-                    <h1 className="text-[34px] font-bold tracking-tight text-white mb-0 leading-none text-glow-strong cursor-help">
+                    <h1 className="text-[34px] font-blackletter tracking-wide text-white mb-0 leading-none drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] cursor-help">
                       m5rcel
                     </h1>
                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-[#161616] text-[#ddd] text-[11px] px-3 py-1.5 rounded-lg border border-white/10 pointer-events-none z-50 shadow-xl whitespace-nowrap font-mono scale-95 group-hover:scale-100 origin-bottom">
@@ -357,16 +363,45 @@ export default function App() {
                   </div>
 
                   <div className="flex items-center gap-1.5 bg-[#171717] border border-white/5 rounded-full px-2.5 py-1.5 shadow-inner">
-                    <BadgeIcon title="Staff" icon={<Shield />} />
-                    <BadgeIcon title="Bug Hunter" icon={<Bug />} />
-                    <BadgeIcon title="Domain Legend" icon={<Globe />} />
+                    <BadgeIcon
+                      title="Staff"
+                      icon={
+                        <img
+                          src="https://raw.githubusercontent.com/m4rcel-lol/assets/main/IMG_6133.png"
+                          alt="Staff Badge"
+                          className="brightness-0 invert"
+                        />
+                      }
+                    />
+                    <BadgeIcon
+                      title="Bug Hunter"
+                      icon={
+                        <img
+                          src="https://raw.githubusercontent.com/m4rcel-lol/assets/main/IMG_6137.png"
+                          alt="Bug Hunter Badge"
+                          className="grayscale brightness-[1.5] contrast-125 saturate-0"
+                        />
+                      }
+                    />
+                    <BadgeIcon
+                      title="Domain Legend (Spaceship)"
+                      icon={
+                        <img
+                          src="https://raw.githubusercontent.com/m4rcel-lol/assets/main/Untitled407_20260430102441.png"
+                          alt="Domain Legend Badge (Spaceship)"
+                          className="brightness-0 invert"
+                        />
+                      }
+                    />
                     <BadgeIcon
                       title="european-commission-europa.eu"
-                      icon={<Landmark />}
+                      icon={
+                        <img
+                          src="https://raw.githubusercontent.com/m4rcel-lol/assets/main/Untitled408_20260430103605.png"
+                          alt="european-commission-europa.eu"
+                        />
+                      }
                     />
-                    <BadgeIcon title="Christmas 2025" icon={<Snowflake />} />
-                    <BadgeIcon title="Easter 2025" icon={<Rabbit />} />
-                    <BadgeIcon title="Easter 2026" icon={<Rabbit />} />
                   </div>
                 </div>
 
@@ -387,6 +422,10 @@ export default function App() {
                 <SocialIcon
                   href="https://github.com/m4rcel-lol"
                   icon={<GithubIcon />}
+                />
+                <SocialIcon
+                  href="https://twitter.com/m5rcode"
+                  icon={<XIcon />}
                 />
                 <SocialIcon
                   href="mailto:m5rcel@linux-user.fyi"
@@ -420,7 +459,7 @@ export default function App() {
 
               <div className="flex flex-col flex-1 min-w-0 justify-center">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="font-semibold text-[15px] truncate text-white">
+                  <span className="font-blackletter text-[17px] tracking-wide truncate text-white">
                     {lanyard?.discord_user?.username || "m5rcel"}
                   </span>
                   {clan?.tag && (
@@ -455,7 +494,7 @@ export default function App() {
               </div>
             </section>
 
-            {lanyard?.listening_to_spotify && lanyard.spotify ? (
+            {lanyard?.listening_to_spotify && lanyard.spotify && (
               <section
                 className="bg-[#0f0f0f] border border-white/5 rounded-[16px] p-4 flex items-center gap-4 shadow-xl"
                 style={{ transform: "translateZ(30px)" }}
@@ -496,45 +535,6 @@ export default function App() {
                 <div className="flex items-center pl-2 pr-1">
                   <a
                     href={`https://open.spotify.com/track/${lanyard.spotify.track_id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title="Listen on Spotify"
-                    className="text-white hover:text-[#1db954] opacity-80 hover:opacity-100 hover:scale-110 transition-all flex items-center justify-center p-2"
-                  >
-                    <SpotifyIcon />
-                  </a>
-                </div>
-              </section>
-            ) : (
-              <section
-                className="bg-[#0f0f0f] border border-white/5 rounded-[16px] p-4 flex items-center gap-4 opacity-80 shadow-xl transition-all duration-300"
-                style={{ transform: "translateZ(30px)" }}
-              >
-                <div className="w-[60px] h-[60px] rounded-[6px] bg-[#161616] flex items-center justify-center shrink-0 border border-white/5 shadow-inner">
-                  <Play
-                    className="w-6 h-6 text-[#555] ml-1"
-                    fill="currentColor"
-                  />
-                </div>
-                <div className="flex-1 flex flex-col justify-center min-w-0">
-                  <div className="font-semibold text-[14px] text-white/90 truncate w-full">
-                    god like - summrs
-                  </div>
-                  <div className="flex items-center gap-[10px] mt-2.5 w-full">
-                    <span className="text-[11px] text-[#777] font-mono shrink-0 w-[28px]">
-                      0:01
-                    </span>
-                    <div className="h-[3px] flex-1 bg-[#222] rounded-full relative shrink-0 overflow-hidden shadow-inner">
-                      <div className="absolute top-0 left-0 h-full bg-[#aaa] rounded-full w-[10%]" />
-                    </div>
-                    <span className="text-[11px] text-[#777] font-mono shrink-0 w-[28px] text-right">
-                      2:12
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center pl-2 pr-1">
-                  <a
-                    href="https://open.spotify.com/search/god%20like%20summrs"
                     target="_blank"
                     rel="noopener noreferrer"
                     title="Listen on Spotify"
@@ -634,9 +634,9 @@ export default function App() {
 function BadgeIcon({ title, icon }: { title: string; icon: React.ReactNode }) {
   return (
     <div className="group relative inline-flex items-center justify-center pointer-events-auto">
-      <div className="text-[#bbb] hover:text-white hover:scale-110 transition-all cursor-help p-1">
+      <div className="text-white hover:scale-110 transition-transform duration-300 cursor-help p-1 drop-shadow-[0_0_6px_rgba(255,255,255,0.6)] hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.9)]">
         {React.cloneElement(icon as React.ReactElement, {
-          className: "w-4 h-4",
+          className: `w-5 h-5 ${(icon as React.ReactElement).props.className || ""}`,
         })}
       </div>
       <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-[#161616] text-[#ddd] text-[11px] px-2.5 py-1.5 rounded-lg border border-white/10 pointer-events-none z-50 shadow-xl whitespace-nowrap font-medium scale-95 group-hover:scale-100 origin-bottom">
@@ -712,6 +712,17 @@ const GlobeIcon = () => (
     xmlns="http://www.w3.org/2000/svg"
   >
     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+  </svg>
+);
+
+const XIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    className="w-[28px] h-[28px]"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
   </svg>
 );
 
