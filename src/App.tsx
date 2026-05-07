@@ -408,7 +408,7 @@ export default function App() {
                       }
                     />
                     <BadgeIcon
-                      title="european-commission-europa.eu"
+                      title="Owner of european-commission-europa.eu domain"
                       icon={
                         <img
                           src="https://raw.githubusercontent.com/m4rcel-lol/assets/main/Untitled408_20260430103605.png"
@@ -656,6 +656,9 @@ export default function App() {
               </div>
             </section>
           </TiltCard>
+          
+          {/* Akkoma verification */}
+          <a href="https://social.european-commission-europa.eu" rel="me" className="hidden">Find me on my Social</a>
         </main>
       </div>
     </div>
@@ -683,7 +686,7 @@ function SocialIcon({ href, icon }: { href: string; icon: React.ReactNode }) {
     <a
       href={href}
       target="_blank"
-      rel="noopener noreferrer"
+      rel="me noopener noreferrer"
       className="text-white icon-glow opacity-90 hover:opacity-100 hover:scale-110 transition-all flex items-center justify-center"
     >
       {icon}
