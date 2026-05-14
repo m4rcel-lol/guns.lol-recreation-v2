@@ -135,7 +135,7 @@ function TiltCard({
 
 export default function App() {
   const lanyard = useLanyard(DISCORD_ID);
-  const [hasEntered, setHasEntered] = useState(false);
+  const [hasEntered, setHasEntered] = useState(true);
   const [isReady, setIsReady] = useState(false);
 
   const [progressData, setProgressData] = useState({
@@ -204,12 +204,14 @@ export default function App() {
       const total = end - start;
       const now = Date.now();
       
+      if (total <= 0) return;
+
       // Ensure current doesn't exceed total
       const current = Math.min(Math.max(now - start, 0), total);
       const percent = (current / total) * 100;
 
       setProgressData({
-        percent,
+        percent: isNaN(percent) ? 0 : percent,
         currentStr: formatTime(current),
         totalStr: formatTime(total),
       });
@@ -253,20 +255,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#050505] text-[#fafafa] font-sans antialiased selection:bg-white/20 overflow-hidden relative">
       <div
-        onClick={() => {
-          if (isReady) setHasEntered(true);
-        }}
-        className={`fixed inset-0 z-[100] flex items-center justify-center transition-all duration-1000 ${hasEntered ? "opacity-0 pointer-events-none bg-[#050505]/0 backdrop-blur-none" : "opacity-100 bg-[#050505]/60 backdrop-blur-md"} ${isReady && !hasEntered ? "cursor-pointer" : "cursor-wait"}`}
-      >
-        <span
-          className={`text-white/80 font-mono tracking-[0.2em] text-lg transition-colors duration-300 drop-shadow-lg ${hasEntered ? "" : "animate-[pulse_2s_ease-in-out_infinite]"} ${isReady ? "hover:text-white" : ""}`}
-        >
-          {!isReady ? "[loading...]" : "[click]"}
-        </span>
-      </div>
-
-      <div
-        className={`min-h-screen flex items-center justify-center p-4 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)] transform-gpu ${!hasEntered ? "blur-xl scale-95 opacity-0" : "blur-0 scale-100 opacity-100"}`}
+        className="min-h-screen flex items-center justify-center p-4 transition-all duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)] transform-gpu blur-0 scale-100 opacity-100"
       >
         <main
           className="w-full max-w-[500px] flex flex-col gap-3 relative"
@@ -455,7 +444,7 @@ export default function App() {
               </div>
             </section>
 
-            {lanyard?.listening_to_spotify && lanyard.spotify && (
+            {lanyard?.spotify && (
               <section
                 className="bg-[#0f0f0f] border border-white/5 rounded-[16px] p-4 flex items-center gap-4 shadow-xl"
                 style={{ transform: "translateZ(30px)" }}
@@ -463,7 +452,7 @@ export default function App() {
                 <img
                   src={lanyard.spotify.album_art_url}
                   alt="Album Art"
-                  className="w-[60px] h-[60px] rounded-[6px] shrink-0 pointer-events-none object-cover shadow-md grayscale"
+                  className="w-[60px] h-[60px] rounded-[6px] shrink-0 pointer-events-none object-cover shadow-md"
                 />
 
                 <div className="flex-1 flex flex-col justify-center min-w-0">
