@@ -5,18 +5,15 @@ import {
   MapPin,
   Shield,
   Bug,
-  Globe,
   Landmark,
   Snowflake,
   Rabbit,
   Play,
   SkipBack,
   SkipForward,
-  Calendar,
-  ChevronDown,
 } from "lucide-react";
 
-const DISCORD_ID = "1435161291365814325";
+const DISCORD_ID = "1133035631547793520";
 
 const ArchIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 100 100" fill="currentColor" className={className}>
@@ -79,36 +76,6 @@ const TsIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const DOMAINS = [
-  {
-    name: "arch-linux.eu",
-    icon: <ArchIcon className="w-[16px] h-[16px] text-[#1793d1]" />,
-  },
-  { name: "cachyos.top", icon: <span className="text-[14px]">🚀</span> },
-  {
-    name: "debian.gay",
-    icon: <DebianRainbowIcon className="w-[16px] h-[16px]" />,
-  },
-  {
-    name: "european-commission-europa.eu",
-    icon: <span className="text-[14px]">🇪🇺</span>,
-  },
-  { name: "governmental.eu", icon: <span className="text-[14px]">🏛️</span> },
-  { name: "governmental.gay", icon: <span className="text-[14px]">🏛️🏳️‍🌈</span> },
-  { name: "linux-user.fyi", icon: <span className="text-[14px]">🐧</span> },
-  { name: "localhosting.top", icon: <span className="text-[14px]">🖥️</span> },
-  { name: "m5rcel.top", icon: <span className="text-[14px]">🌟</span> },
-  { name: "m5rcel.work", icon: <span className="text-[14px]">💼</span> },
-  { name: "microslop.fyi", icon: <span className="text-[14px]">🗑️</span> },
-  { name: "noli.gay", icon: <span className="text-[14px]">🏳️‍🌈</span> },
-  { name: "rbxl.eu", icon: <span className="text-[14px]">🟥</span> },
-  { name: "subdomains.fyi", icon: <span className="text-[14px]">🔗</span> },
-  { name: "tweeting.shop", icon: <span className="text-[14px]">🐦</span> },
-  { name: "twitkey.com", icon: <span className="text-[14px]">🔑</span> },
-  { name: "typescript.gay", icon: <TsIcon className="w-[16px] h-[16px]" /> },
-  { name: "windows10.sarl", icon: <span className="text-[14px]">🪟</span> },
-];
-
 function TiltCard({
   children,
   className,
@@ -170,10 +137,6 @@ export default function App() {
   const lanyard = useLanyard(DISCORD_ID);
   const [hasEntered, setHasEntered] = useState(false);
   const [isReady, setIsReady] = useState(false);
-  const [isDomainsOpen, setIsDomainsOpen] = useState(false);
-  const [domainStatuses, setDomainStatuses] = useState<
-    Record<string, "NS" | "A" | false | null>
-  >({});
 
   const [progressData, setProgressData] = useState({
     percent: 0,
@@ -187,39 +150,6 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (isReady && hasEntered) {
-      DOMAINS.forEach(async (domainObj) => {
-        const domain = domainObj.name;
-        try {
-          const [nsRes, aRes] = await Promise.all([
-            fetch(`https://dns.google/resolve?name=${domain}&type=NS`),
-            fetch(`https://dns.google/resolve?name=${domain}&type=A`)
-          ]);
-          const nsData = await nsRes.json();
-          const aData = await aRes.json();
-
-          let statusType: "NS" | "A" | false = false;
-
-          const hasCloudflareNS = 
-            nsData.Status === 0 && 
-            Array.isArray(nsData.Answer) && 
-            nsData.Answer.some((r: any) => r.type === 2 && r.data.toLowerCase().includes("cloudflare.com"));
-
-          if (hasCloudflareNS) {
-            statusType = "NS";
-          } else if (aData.Status === 0 && Array.isArray(aData.Answer) && aData.Answer.length > 0) {
-            statusType = "A";
-          }
-
-          setDomainStatuses((prev) => ({ ...prev, [domain]: statusType }));
-        } catch (e) {
-          setDomainStatuses((prev) => ({ ...prev, [domain]: false }));
-        }
-      });
-    }
-  }, [isReady, hasEntered]);
-
-  useEffect(() => {
     if (!lanyard) return;
 
     const imageUrls: string[] = [];
@@ -229,7 +159,7 @@ export default function App() {
       );
     } else {
       imageUrls.push(
-        `https://api.dicebear.com/7.x/identicon/svg?seed=m5rcel&backgroundColor=111111`,
+        `https://api.dicebear.com/7.x/identicon/svg?seed=Preston&backgroundColor=111111`,
       );
     }
 
@@ -308,7 +238,7 @@ export default function App() {
       if (avatar)
         return `https://cdn.discordapp.com/avatars/${id}/${avatar}.png?size=256`;
     }
-    return `https://api.dicebear.com/7.x/identicon/svg?seed=m5rcel&backgroundColor=111111`;
+    return `https://api.dicebear.com/7.x/identicon/svg?seed=Preston&backgroundColor=111111`;
   };
 
   const statusText =
@@ -351,15 +281,15 @@ export default function App() {
                 <div className="-mt-10 sm:-mt-12 w-[85px] h-[85px] sm:w-[96px] sm:h-[96px] rounded-[18px] sm:rounded-[22px] overflow-hidden border-[5px] border-[#0f0f0f] bg-[#111] z-10 shrink-0 shadow-lg">
                   <img
                     src={getAvatarUrl()}
-                    alt="m5rcel"
+                    alt="Preston"
                     className="w-full h-full object-cover"
                   />
                 </div>
 
                 <div className="flex items-center gap-3 mt-4 text-[11.5px] text-[#888] font-medium tracking-wide">
                   <span className="flex items-center gap-1.5">
-                    <MapPin className="w-[14px] h-[14px] text-[#ccc]" /> Warsaw,
-                    Poland
+                    <MapPin className="w-[14px] h-[14px] text-[#ccc]" /> 
+                    United Kingdom
                   </span>
                 </div>
               </div>
@@ -367,8 +297,8 @@ export default function App() {
               <div className="mt-4 flex flex-col items-start gap-1">
                 <div className="flex items-center flex-wrap gap-x-3 gap-y-2">
                   <div className="group relative inline-block">
-                    <h1 className="text-[34px] font-blackletter tracking-wide text-white mb-0 leading-none drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] cursor-help">
-                      m5rcel
+                    <h1 className="text-[34px] font-sans font-bold tracking-wide text-white mb-0 leading-none drop-shadow-[0_0_10px_rgba(255,255,255,0.5)] cursor-help">
+                      Preston
                     </h1>
                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-[#161616] text-[#ddd] text-[11px] px-3 py-1.5 rounded-lg border border-white/10 pointer-events-none z-50 shadow-xl whitespace-nowrap font-mono scale-95 group-hover:scale-100 origin-bottom">
                       UID: {lanyard?.discord_user?.id || DISCORD_ID}
@@ -378,41 +308,52 @@ export default function App() {
 
                   <div className="flex items-center gap-1.5 bg-[#171717] border border-white/5 rounded-full px-2.5 py-1.5 shadow-inner">
                     <BadgeIcon
-                      title="Staff"
+                      title="HypeSquad Balance"
                       icon={
                         <img
-                          src="https://raw.githubusercontent.com/m4rcel-lol/assets/main/IMG_6133.png"
-                          alt="Staff Badge"
+                          src="https://raw.githubusercontent.com/m4rcel-lol/assets/main/liirkwf8yip51.png"
+                          alt="HypeSquad Balance Badge"
                           className="brightness-0 invert"
                         />
                       }
                     />
                     <BadgeIcon
-                      title="Bug Hunter"
+                      title="Originally known as prestonstyleza#7062"
                       icon={
                         <img
-                          src="https://raw.githubusercontent.com/m4rcel-lol/assets/main/IMG_6137.png"
-                          alt="Bug Hunter Badge"
+                          src="https://raw.githubusercontent.com/m4rcel-lol/assets/main/2902-originally-known-as.png"
+                          alt="Originally known as prestonstyleza#7062"
                           className="grayscale brightness-[1.5] contrast-125 saturate-0"
                         />
                       }
                     />
                     <BadgeIcon
-                      title="Domain Legend (Spaceship)"
+                      title="Completed a quest"
                       icon={
                         <img
-                          src="https://raw.githubusercontent.com/m4rcel-lol/assets/main/Untitled407_20260430102441.png"
-                          alt="Domain Legend Badge (Spaceship)"
+                          src="https://raw.githubusercontent.com/m4rcel-lol/assets/main/66366-completed-a-quest.png"
+                          alt="Completed a quest"
                           className="brightness-0 invert"
                         />
                       }
                     />
                     <BadgeIcon
-                      title="Owner of european-commission-europa.eu domain"
+                      title="Last Meadow Online: Level 100 Reached"
                       icon={
                         <img
-                          src="https://raw.githubusercontent.com/m4rcel-lol/assets/main/Untitled408_20260430103605.png"
-                          alt="european-commission-europa.eu"
+                          src="https://raw.githubusercontent.com/m4rcel-lol/assets/main/Ca105ad9cfc8580c765101d17bbb2323.webp"
+                          alt="Last Meadow Online: Level 100 Reached"
+                          className="brightness-0 invert"
+                        />
+                      }
+                    />
+                    <BadgeIcon
+                      title="Orbs Apprentice"
+                      icon={
+                        <img
+                          src="https://raw.githubusercontent.com/m4rcel-lol/assets/main/OrbsApprentice.webp"
+                          alt="Orbs Apprentice"
+                          className="grayscale brightness-[1.5] contrast-125 saturate-0"
                         />
                       }
                     />
@@ -420,38 +361,44 @@ export default function App() {
                 </div>
 
                 <div className="mt-3 text-[#b0b0b0] text-[13px] leading-relaxed max-w-[420px]">
-                  15 y.o passionate dev that likes AI coding. idc what u say
-                  about me or AI, it's my interests lol. bday in
-                  <span className="inline-flex items-center gap-1.5 px-1.5 py-0.5 ml-1.5 rounded-[5px] bg-[#1a1a1a] border border-white/5 text-[11px] font-bold tracking-wider text-[#ddd] shadow-sm">
-                    <Calendar className="w-3 h-3 text-white" /> August 31st
-                  </span>
+                  #Free Palestine<br />
+                  ♥️ Charles Marc Hervé Perceval Leclerc<br />
+                  Fernando Alonso Especially Renault-2005
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 mt-8">
+              <div className="flex items-center gap-4 mt-8 flex-wrap">
                 <SocialIcon
-                  href={`https://discord.com/users/${DISCORD_ID}`}
+                  href="https://discord.gg/hhtVPxRfeV"
                   icon={<DiscordIcon />}
                 />
                 <SocialIcon
-                  href="https://github.com/m4rcel-lol"
-                  icon={<GithubIcon />}
+                  href="https://www.roblox.com/users/1651304800/profile"
+                  icon={<RobloxIcon />}
                 />
                 <SocialIcon
-                  href="https://twitter.com/m5rcode"
+                  href="https://open.spotify.com/user/31j6eqpowt5rzxafange64ti3bwy"
+                  icon={<SpotifyIcon className="w-[28px] h-[28px]" />}
+                />
+                <SocialIcon
+                  href="https://www.tiktok.com/@prestonrbx"
+                  icon={<TiktokIcon />}
+                />
+                <SocialIcon
+                  href="https://www.twitch.tv/prestonrbx"
+                  icon={<TwitchIcon />}
+                />
+                <SocialIcon
+                  href="https://www.youtube.com/channel/UC8IoBrAYmY-ARcJpoula4QQ"
+                  icon={<YoutubeIcon />}
+                />
+                <SocialIcon
+                  href="https://www.youtube.com/channel/UCXvH25Qa1oXCyF8edm0r07A"
+                  icon={<YoutubeIcon />}
+                />
+                <SocialIcon
+                  href="https://x.com/PrestonRBX"
                   icon={<XIcon />}
-                />
-                <SocialIcon
-                  href="mailto:m5rcel@linux-user.fyi"
-                  icon={<MailIcon />}
-                />
-                <SocialIcon
-                  href="https://t.me/m5rcel"
-                  icon={<TelegramIcon />}
-                />
-                <SocialIcon
-                  href="https://social.european-commission-europa.eu/m5rcel"
-                  icon={<GlobeIcon />}
                 />
               </div>
             </section>
@@ -473,8 +420,8 @@ export default function App() {
 
               <div className="flex flex-col flex-1 min-w-0 justify-center">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="font-blackletter text-[17px] tracking-wide truncate text-white">
-                    {lanyard?.discord_user?.username || "m5rcel"}
+                  <span className="font-sans font-semibold text-[17px] tracking-wide truncate text-white">
+                    {lanyard?.discord_user?.username || "prestonstyleza"}
                   </span>
                   {clan?.tag && (
                     <div className="group relative inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-[5px] bg-[#1a1a1a] border border-white/5 text-[9px] font-bold tracking-wider text-[#a0a0a0] cursor-help">
@@ -559,102 +506,6 @@ export default function App() {
                 </div>
               </section>
             )}
-
-            <section
-              className="bg-[#0f0f0f] border border-white/5 rounded-[16px] shadow-xl overflow-hidden transition-all duration-300"
-              style={{ transform: "translateZ(15px)" }}
-            >
-              <button
-                onClick={() => setIsDomainsOpen(!isDomainsOpen)}
-                className="w-full p-4 flex items-center justify-between text-white/90 hover:text-white hover:bg-white/[0.02] transition-colors outline-none cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-[32px] h-[32px] rounded-full bg-[#111] border border-white/5 flex items-center justify-center">
-                    <Globe className="w-4 h-4 text-[#888]" />
-                  </div>
-                  <span className="font-semibold text-[14px]">
-                    Domains ({DOMAINS.length})
-                  </span>
-                </div>
-                <ChevronDown
-                  className={`w-4 h-4 text-[#666] transition-transform duration-300 ${isDomainsOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-
-              <div
-                className={`grid transition-all duration-300 ease-in-out ${isDomainsOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
-              >
-                <div className="overflow-hidden">
-                  <div className="p-4 pt-0 flex flex-col gap-1 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
-                    {[...DOMAINS]
-                      .sort((a, b) => {
-                        const getWeight = (status: "NS" | "A" | false | null | undefined) => {
-                          if (status === "NS" || status === "A") return 2;
-                          if (status === undefined || status === null) return 1;
-                          return 0;
-                        };
-                        const aWeight = getWeight(domainStatuses[a.name]);
-                        const bWeight = getWeight(domainStatuses[b.name]);
-                        if (aWeight !== bWeight) return bWeight - aWeight;
-                        return a.name.localeCompare(b.name);
-                      })
-                      .map((domainObj) => {
-                      const domain = domainObj.name;
-                      const isActive = domainStatuses[domain];
-                      const isChecking =
-                        isActive === undefined || isActive === null;
-
-                      return (
-                        <a
-                          key={domain}
-                          href={`https://${domain}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`flex items-center justify-between py-2 px-3 rounded-[8px] hover:bg-white/[0.03] transition-colors ${!isChecking && !isActive ? "opacity-50 grayscale pointer-events-none" : "group"}`}
-                        >
-                          <div className="flex items-center gap-2.5 truncate pr-4">
-                            <div className="w-[18px] h-[18px] flex items-center justify-center shrink-0">
-                              {domainObj.icon}
-                            </div>
-                            <span
-                              className={`text-[13px] font-medium text-[#ccc] ${!isChecking && !isActive ? "" : "group-hover:text-white"} transition-colors truncate`}
-                            >
-                              {domain}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {isChecking ? (
-                              <span className="text-[10px] uppercase font-bold tracking-wider text-[#555] bg-[#161616] px-2 py-1 rounded-[4px] border border-white/5 animate-pulse">
-                                Checking...
-                              </span>
-                            ) : isActive ? (
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-[10px] uppercase font-bold tracking-wider text-[#aaa] bg-[#1a1a1a] px-1.5 py-0.5 rounded-[4px] border border-white/10">
-                                  {isActive}
-                                </span>
-                                <div className="flex items-center gap-1.5">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-[#23a559] animate-pulse shadow-[0_0_5px_#23a559]"></span>
-                                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#555] group-hover:text-[#888] bg-[#161616] px-2 py-1 rounded-[4px] border border-white/5">
-                                    Active
-                                  </span>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#f87171]"></span>
-                                <span className="text-[10px] uppercase font-bold tracking-wider text-[#f87171] bg-[#161616] px-2 py-1 rounded-[4px] border border-[#f87171]/20">
-                                  Inactive
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </a>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </section>
           </TiltCard>
           
           {/* Akkoma verification */}
@@ -760,13 +611,59 @@ const XIcon = () => (
   </svg>
 );
 
-const SpotifyIcon = () => (
+const SpotifyIcon = ({ className }: { className?: string }) => (
   <svg
     viewBox="0 0 24 24"
-    className="w-[20px] h-[20px]"
+    className={className || "w-[20px] h-[20px]"}
     fill="currentColor"
     xmlns="http://www.w3.org/2000/svg"
   >
     <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.24 1.02zm1.44-2.22c-.302.48-.9.66-1.38.36-3.24-2.04-8.16-2.64-11.94-1.44-.54.18-1.08-.12-1.26-.66-.18-.54.12-1.08.66-1.26 4.32-1.38 9.72-.66 13.56 1.62.48.3.66.9.36 1.38zm.12-2.4c-3.9-2.28-10.26-2.52-14.04-1.38-.66.18-1.32-.18-1.5-.84-.18-.66.18-1.32.84-1.5 4.38-1.32 11.28-1.02 15.78 1.62.6.36.78 1.08.42 1.68-.36.6-1.08.78-1.68.42z" />
+  </svg>
+);
+
+const RobloxIcon = () => (
+  <svg
+    role="img"
+    viewBox="0 0 24 24"
+    className="w-[28px] h-[28px]"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <title>Roblox</title>
+    <path d="m13.383 14.341-3.726-.958.959-3.726 3.726.959-.96 3.726zM4.913 0 0 19.088 19.088 24 24 4.912 4.912 0z"/>
+  </svg>
+);
+
+const TiktokIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    className="w-[26px] h-[26px]"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.12-3.44-3.17-3.8-5.46-.4-2.51.2-5.02 1.77-6.95 1.54-1.87 3.9-3 6.36-2.92v4.06c-1.3.06-2.56.66-3.41 1.62-.57.65-.96 1.45-1.07 2.33-.14 1.25.13 2.52.88 3.5 1.07 1.34 2.82 2.01 4.5 1.76 1.12-.17 2.15-.79 2.84-1.67.62-.83.94-1.86.95-2.9 0-4.87-.04-9.74.02-14.61z"/>
+  </svg>
+);
+
+const TwitchIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    className="w-[28px] h-[28px]"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M2.149 0l-1.612 4.119v16.836h5.731v3.045h3.224l3.045-3.045h4.657l6.806-6.806v-14.149h-21.851zm19.164 13.104l-4.299 4.299h-4.657l-3.045 3.045v-3.045h-4.836v-15.045h16.836v10.746zm-5.373-6.269v6.09h-1.97v-6.09h1.97zm-4.657 0v6.09h-1.97v-6.09h1.97z"/>
+  </svg>
+);
+
+const YoutubeIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    className="w-[28px] h-[28px]"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
   </svg>
 );
